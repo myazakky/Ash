@@ -27,6 +27,20 @@ RSpec.describe Page do
       expect(result).to eq expection
     end
 
+    it 'judge kind of [**--** _] is bold strike bold' do
+      lines = ['[**--** StrikeBold]']
+      page = Page.new(lines)
+
+      result = page.analyse
+      exception = [[
+        Literal.new([
+          Literal.new([
+            Literal.new([
+              Literal.new('StrikeBold', Kind::PLAIN)], Kind::BOLD)], Kind::STRIKE)], Kind::BOLD)]]
+
+      expect(result).to eq exception
+    end
+
     it ' judge others is PLAIN' do
       lines = ['Hello', '[$ \LaTex]', '[link]']
       page = Page.new(lines)

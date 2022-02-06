@@ -14,16 +14,28 @@ class Page
   def analyse_helper(tokens, result, n, by_bracket)
     return [result, n] if tokens.nil? || tokens.empty?
 
-    if (left_bracket? tokens[0]) && (many? :bold?, tokens[1]) && (many? :white?, tokens[2])
-      content = analyse_helper(tokens[3..], [], 0, true)
-      read_at = content[1] + n
+    if (left_bracket? tokens[0]) && (many? :bold?, tokens[1]) && ((many? :white?, tokens[2]) || (many? :decoration?, tokens[2]))
+      if many? :white?, tokens[2]
+        content = analyse_helper(tokens[3..], [], 0, true)
+        read_at = content[1] + n + 1
+      else
+        content = analyse_helper(['['] + tokens[2..], [], 0, true)
+        read_at = content[1] + n
+      end
+
       literal = Literal.new(content[0], Kind::BOLD)
-      analyse_helper(tokens[(read_at + 1)..], result + [literal], read_at, false)
-    elsif (left_bracket? tokens[0]) && (many? :strike?, tokens[1]) && (many? :white?, tokens[2])
-      content = analyse_helper(tokens[3..], [], 0, true)
-      read_at = content[1] + n
+      analyse_helper(tokens[(read_at + 2)..], result + [literal], read_at + 1, false)
+    elsif (left_bracket? tokens[0]) && (many? :strike?, tokens[1]) && ((many? :white?, tokens[2]) || (many? :decoration?, tokens[2]))
+      if many? :white?, tokens[2]
+        content = analyse_helper(tokens[3..], [], 0, true)
+        read_at = content[1] + n + 1
+      else
+        content = analyse_helper(['['] + tokens[2..], [], 0, true)
+        read_at = content[1] + n
+      end
+
       literal = Literal.new(content[0], Kind::STRIKE)
-      analyse_helper(tokens[(read_at + 1)..], result + [literal], read_at, false)
+      analyse_helper(tokens[(read_at + 2)..], result + [literal], read_at + 1, false)
     elsif (right_bracket? tokens[0]) && by_bracket
       [result, n + 1]
     elsif result.size.zero?

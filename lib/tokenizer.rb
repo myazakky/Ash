@@ -17,6 +17,10 @@ module Tokenizer
     c == '-'
   end
 
+  def decoration?(c)
+    (strike? c) || (bold? c)
+  end
+
   def white?(c)
     [' ', '　'].include?(c)
   end
