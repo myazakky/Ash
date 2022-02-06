@@ -2,4 +2,5 @@
 
 module Kind
   PLAIN = :PLAIN
+  BOLD = :BOLD
 end

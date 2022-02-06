@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module Tokenizer
-  def right_bracket?(c)
+  def left_bracket?(c)
     c == '['
   end
 
-  def left_bracket?(c)
+  def right_bracket?(c)
     c == ']'
   end
 
@@ -17,12 +17,20 @@ module Tokenizer
     [' ', '　'].include?(c)
   end
 
+  def many?(condition, text)
+    return false if text.nil?
+
+    return true if text.empty?
+
+    method(condition).call(text[0]) && many?(condition, text[1..])
+  end
+
   def tokenize_helper(s, result, want_next)
     return result if s.empty?
 
-    if right_bracket? s[0]
+    if left_bracket? s[0]
       tokenize_helper(s[1..], result + ['['], :any)
-    elsif left_bracket? s[0]
+    elsif right_bracket? s[0]
       tokenize_helper(s[1..], result + [']'], :any)
     elsif (white? s[0]) && want_next == :white
       result[-1] += s[0]
@@ -36,7 +44,7 @@ module Tokenizer
       tokenize_helper(s[1..], result + [s[0]], :bold)
     elsif want_next != :any
       tokenize_helper(s[1..], result + [s[0]], :any)
-    else 
+    else
       result[-1] += s[0]
       tokenize_helper(s[1..], result, :any)
     end
