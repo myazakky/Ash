@@ -13,6 +13,10 @@ module Tokenizer
     c == '*'
   end
 
+  def strike?(c)
+    c == '-'
+  end
+
   def white?(c)
     [' ', '　'].include?(c)
   end
@@ -42,6 +46,11 @@ module Tokenizer
       tokenize_helper(s[1..], result, :bold)
     elsif bold? s[0]
       tokenize_helper(s[1..], result + [s[0]], :bold)
+    elsif (strike? s[0]) && want_next == :strike
+      result[-1] += s[0]
+      tokenize_helper(s[1..], result, :strike)
+    elsif strike? s[0]
+      tokenize_helper(s[1..], result + [s[0]], :strike)
     elsif want_next != :any
       tokenize_helper(s[1..], result + [s[0]], :any)
     else

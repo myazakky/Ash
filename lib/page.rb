@@ -19,6 +19,11 @@ class Page
       read_at = content[1] + n
       literal = Literal.new(content[0], Kind::BOLD)
       analyse_helper(tokens[(read_at + 1)..], result + [literal], read_at, false)
+    elsif (left_bracket? tokens[0]) && (many? :strike?, tokens[1]) && (many? :white?, tokens[2])
+      content = analyse_helper(tokens[3..], [], 0, true)
+      read_at = content[1] + n
+      literal = Literal.new(content[0], Kind::STRIKE)
+      analyse_helper(tokens[(read_at + 1)..], result + [literal], read_at, false)
     elsif (right_bracket? tokens[0]) && by_bracket
       [result, n + 1]
     elsif result.size.zero?
