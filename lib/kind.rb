@@ -5,4 +5,5 @@ module Kind
   BOLD = :BOLD
   STRIKE = :STRIKE
   LINK = :LINK
+  LATEX = :LATEX
 end

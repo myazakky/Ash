@@ -9,6 +9,10 @@ module Tokenizer
     c == ']'
   end
 
+  def latex?(c)
+    c == '$'
+  end
+
   def bold?(c)
     c == '*'
   end
@@ -40,6 +44,8 @@ module Tokenizer
       tokenize_helper(s[1..], result + ['['], :any)
     elsif right_bracket? s[0]
       tokenize_helper(s[1..], result + [']'], :any)
+    elsif latex? s[0]
+      tokenize_helper(s[1..], result + ['$'], :any)
     elsif (white? s[0]) && want_next == :white
       result[-1] += s[0]
       tokenize_helper(s[1..], result, :white)

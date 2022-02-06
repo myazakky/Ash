@@ -26,5 +26,10 @@ RSpec.describe Tokenizer do
       result = tokenizer.tokenize '[a]'
       expect(result).to eq ['[', 'a', ']']
     end
+
+    it 'tokenize [$ a] to [ $ \LaTex ]' do
+      result = tokenizer.tokenize '[$ \LaTex]'
+      expect(result).to eq ['[', '$', ' ', '\LaTex', ']']
+    end
   end
 end
