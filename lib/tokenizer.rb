@@ -13,6 +13,10 @@ module Tokenizer
     c == '$'
   end
 
+  def backquote?(c)
+    c == '`'
+  end
+
   def bold?(c)
     c == '*'
   end
@@ -40,12 +44,8 @@ module Tokenizer
   def tokenize_helper(s, result, want_next)
     return result if s.empty?
 
-    if left_bracket? s[0]
-      tokenize_helper(s[1..], result + ['['], :any)
-    elsif right_bracket? s[0]
-      tokenize_helper(s[1..], result + [']'], :any)
-    elsif latex? s[0]
-      tokenize_helper(s[1..], result + ['$'], :any)
+    if (left_bracket? s[0]) || (right_bracket? s[0]) || (latex? s[0]) || (backquote? s[0])
+      tokenize_helper(s[1..], result + [s[0]], :any)
     elsif (white? s[0]) && want_next == :white
       result[-1] += s[0]
       tokenize_helper(s[1..], result, :white)

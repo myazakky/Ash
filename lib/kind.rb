@@ -8,4 +8,5 @@ module Kind
   LATEX = :LATEX
   CODE = :CODE
   INDENT = :INDENT
+  CODEBLOCK = :CODEBLOCK
 end

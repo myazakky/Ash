@@ -79,6 +79,14 @@ EOF
       expect(page.analyse).to eq expection
     end
 
+    it 'judge kind of `[aa]` is codeblock'do
+      lines = ['`[aa]`']
+      page = Page.new(lines)
+
+      expection = [[Literal.new(Literal.new('[aa]', Kind::PLAIN), Kind::CODEBLOCK)]]
+      expect(page.analyse).to eq expection
+    end
+
     it ' judge others is PLAIN' do
       lines = ['Hello', 'Test']
       page = Page.new(lines)

@@ -36,6 +36,10 @@ class Page
 
       literal = Literal.new(content[0], Kind::STRIKE)
       analyse_helper(tokens[(read_at + 2)..], result + [literal], read_at + 1, false)
+    elsif backquote? tokens[0]
+      next_backquote = tokens[1..].index('`')
+      literal = Literal.new(Literal.new(tokens[1..next_backquote].inject(&:+), Kind::PLAIN), Kind::CODEBLOCK)
+      analyse_helper(tokens[(next_backquote + 2)..], result + [literal], next_backquote + 1, false)
     elsif (left_bracket? tokens[0]) && (latex? tokens[1]) && (many? :white?, tokens[2])
       read_at = tokens[3..].index(']') + 3
       literal = Literal.new(tokens[3..(read_at - 1)].inject(&:+), Kind::LATEX)
