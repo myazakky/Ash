@@ -47,6 +47,9 @@ class Page
       analyse_helper(tokens[(read_at + 2)..], result + [literal], read_at + 1, false)
     elsif (right_bracket? tokens[0]) && by_bracket
       [result, n + 1]
+    elsif (tokens[0].start_with? 'code:') && result.empty? && !by_bracket
+      literal = Literal.new(tokens.inject(&:+), Kind::CODE, { code: '' })
+      [[literal], 0]
     elsif result.size.zero?
       literal = Literal.new(tokens[0], Kind::PLAIN)
       analyse_helper(tokens[1..], [literal], n + 1, by_bracket)
@@ -59,9 +62,30 @@ class Page
   end
 
   def analyse
-    @row_lines.map do |row_line|
-      tokens = tokenize(row_line)
-      analyse_helper(tokens, [], 0, false)[0]
+    @row_lines.inject([]) do |result, row_line|
+      tokens = tokenize row_line
+      depth = if many? :white?, tokens[0]
+        tokens[0].count(' ') + tokens[0].count('　')
+      else
+        0
+      end
+      if !result.empty? && result[-1][-1].kind == Kind::CODE && depth > 0
+        result[-1][-1].data[:code] += "#{tokens.inject(&:+)[1..]}\n"
+        result
+      elsif !result.empty? &&
+              result[-1][-1].kind == Kind::INDENT &&
+              result[-1][-1].text[0].kind == Kind::CODE &&
+              result[-1][-1].data[:depth] < depth
+        result[-1][-1].text[0].data[:code] += "#{tokens.inject(&:+)[(result[-1][-1].data[:depth] + 1)..]}\n"
+        result
+      elsif depth.zero?
+        new_item = (analyse_helper tokens, [], 0, false)[0]
+        result + [new_item]
+      else
+        new_item = (analyse_helper tokens[1..], [], 0, false)[0]
+        new_item = Literal.new(new_item, Kind::INDENT, { depth: depth })
+        result + [[new_item]]
+      end
     end
   end
 end

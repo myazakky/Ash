@@ -55,6 +55,30 @@ RSpec.describe Page do
       expect(page.analyse).to eq [[Literal.new('\LaTex', Kind::LATEX)]]
     end
 
+    it 'analyse code' do
+      lines = [
+        ' code:example.rb',
+        '  list = [',
+        '    1, 2, 3',
+        '  ]',
+        '  EOF',
+        'end'
+      ]
+      page = Page.new(lines)
+      expection = [
+        [Literal.new([Literal.new('code:example.rb', Kind::CODE, {
+          code: """list = [
+  1, 2, 3
+]
+EOF
+"""
+        })], Kind::INDENT, { depth: 1 })],
+        [Literal.new('end', Kind::PLAIN)]
+      ]
+
+      expect(page.analyse).to eq expection
+    end
+
     it ' judge others is PLAIN' do
       lines = ['Hello', 'Test']
       page = Page.new(lines)

@@ -6,4 +6,6 @@ module Kind
   STRIKE = :STRIKE
   LINK = :LINK
   LATEX = :LATEX
+  CODE = :CODE
+  INDENT = :INDENT
 end
