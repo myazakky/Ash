@@ -41,8 +41,15 @@ RSpec.describe Page do
       expect(result).to eq exception
     end
 
+    it 'judge kind of [__] is link' do
+      lines = ['[link yeah]']
+      page = Page.new(lines)
+
+      expect(page.analyse).to eq [[Literal.new([Literal.new('link yeah', Kind::PLAIN)], Kind::LINK)]]
+    end
+
     it ' judge others is PLAIN' do
-      lines = ['Hello', '[$ \LaTex]', '[link]']
+      lines = ['Hello', 'Test']
       page = Page.new(lines)
 
       page.analyse.each_with_index do |line, index|

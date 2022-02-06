@@ -21,5 +21,10 @@ RSpec.describe Tokenizer do
       result = tokenizer.tokenize '[--**-- BoldStrike]'
       expect(result).to eq ['[', '--', '**', '--', ' ', 'BoldStrike', ']']
     end
+
+     it 'tokenize [a] to [ a ]' do
+      result = tokenizer.tokenize '[a]'
+      expect(result).to eq ['[', 'a', ']']
+    end
   end
 end

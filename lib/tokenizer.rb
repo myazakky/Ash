@@ -55,11 +55,11 @@ module Tokenizer
       tokenize_helper(s[1..], result, :strike)
     elsif strike? s[0]
       tokenize_helper(s[1..], result + [s[0]], :strike)
-    elsif want_next != :any
-      tokenize_helper(s[1..], result + [s[0]], :any)
-    else
+    elsif want_next == :plain
       result[-1] += s[0]
-      tokenize_helper(s[1..], result, :any)
+      tokenize_helper(s[1..], result, :plain)
+    else
+      tokenize_helper(s[1..], result + [s[0]], :plain)
     end
   end
 

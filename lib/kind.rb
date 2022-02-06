@@ -4,4 +4,5 @@ module Kind
   PLAIN = :PLAIN
   BOLD = :BOLD
   STRIKE = :STRIKE
+  LINK = :LINK
 end

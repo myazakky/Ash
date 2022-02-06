@@ -36,6 +36,12 @@ class Page
 
       literal = Literal.new(content[0], Kind::STRIKE)
       analyse_helper(tokens[(read_at + 2)..], result + [literal], read_at + 1, false)
+    elsif (left_bracket? tokens[0]) && !tokens[1].nil?
+      p tokens
+      content = analyse_helper(tokens[1..], [], 0, true)
+      literal = Literal.new(content[0], Kind::LINK)
+      read_at = content[1] + n
+      analyse_helper(tokens[(read_at + 2)..], result + [literal], read_at + 1, false)
     elsif (right_bracket? tokens[0]) && by_bracket
       [result, n + 1]
     elsif result.size.zero?
