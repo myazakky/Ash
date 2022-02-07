@@ -30,7 +30,7 @@ class Page
     elsif backquote? tokens[0]
       # Case of command line like `hello`
       next_backquote = tokens[1..].index('`') + 1
-      literal = Literal.new(Literal.new(tokens[1..(next_backquote - 1)].inject(&:+), Kind::PLAIN), Kind::CODEBLOCK)
+      literal = Literal.new(tokens[1..(next_backquote - 1)].inject(&:+), Kind::CODEBLOCK)
       analyse_helper(tokens[(next_backquote + 1)..], result + [literal], next_backquote + 1, false)
     elsif (left_bracket? tokens[0]) && (latex? tokens[1]) && (many? :white?, tokens[2])
       # Case of latex like [$ \LaTex]
@@ -66,7 +66,7 @@ class Page
       if !result.empty? && !result[-1].empty? && result[-1][-1].kind == Kind::CODE && depth > 0
         result[-1][-1].data[:code] += "#{tokens.inject(&:+)[1..]}\n"
         result
-      elsif !result.empty? && !result[-1].empty? && result[-1][-1].kind == Kind::INDENT && result[-1][-1].text[0].kind == Kind::CODE && result[-1][-1].data[:depth] < depth
+      elsif !result.empty? && !result[-1].empty? && !result[-1][-1].text.empty? && result[-1][-1].kind == Kind::INDENT && result[-1][-1].text[0].kind == Kind::CODE && result[-1][-1].data[:depth] < depth
         result[-1][-1].text[0].data[:code] += "#{tokens.inject(&:+)[(result[-1][-1].data[:depth] + 1)..]}\n"
         result
       elsif depth.zero?
@@ -78,5 +78,9 @@ class Page
         result + [[new_item]]
       end
     end
+  end
+
+  def to_html
+    analyse.map { _1.map(&:to_html).inject('', &:+) + '<br>' }.inject(&:+)
   end
 end

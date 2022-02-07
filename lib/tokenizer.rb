@@ -30,7 +30,7 @@ module Tokenizer
   end
 
   def white?(c)
-    [' ', '　'].include?(c)
+    [' ', '　', "\t"].include?(c)
   end
 
   def many?(condition, text)

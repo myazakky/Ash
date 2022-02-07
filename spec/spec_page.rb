@@ -83,7 +83,7 @@ EOF
       lines = ['`[aa]`']
       page = Page.new(lines, '')
 
-      expection = [[Literal.new(Literal.new('[aa]', Kind::PLAIN), Kind::CODEBLOCK)]]
+      expection = [[Literal.new('[aa]', Kind::CODEBLOCK)]]
       expect(page.analyse).to eq expection
     end
 
