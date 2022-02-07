@@ -38,10 +38,9 @@ class Page
       analyse_helper(tokens[(read_at + 1)..], result + [literal], read_at + 1, false)
     elsif (left_bracket? tokens[0]) && !tokens[1].nil?
       # Case of link like [Scrapbox is a God tool]
-      content = analyse_helper(tokens[1..], [], 0, true)
-      literal = Literal.new(content[0], Kind::LINK)
-      read_at = content[1] + n
-      analyse_helper(tokens[(read_at + 2)..], result + [literal], read_at + 1, false)
+      next_bracket = tokens[1..].index(']') + 1
+      literal = Literal.new(tokens[1..(next_bracket - 1)].inject(&:+), Kind::LINK)
+      analyse_helper(tokens[(next_bracket + 1)..], result + [literal], next_bracket + 1, false)
     elsif (right_bracket? tokens[0]) && by_bracket
       [result, n + 1]
     elsif (tokens[0].start_with? 'code:') && result.empty? && !by_bracket

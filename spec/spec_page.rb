@@ -45,7 +45,7 @@ RSpec.describe Page do
       lines = ['[link yeah]']
       page = Page.new(lines)
 
-      expect(page.analyse).to eq [[Literal.new([Literal.new('link yeah', Kind::PLAIN)], Kind::LINK)]]
+      expect(page.analyse).to eq [[Literal.new('link yeah', Kind::LINK)]]
     end
 
     it 'judge kind of [$ \Latex] is latex' do
