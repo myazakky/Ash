@@ -7,8 +7,9 @@ require_relative 'tokenizer'
 class Page
   include Tokenizer
 
-  def initialize(row_lines)
+  def initialize(row_lines, project)
     @row_lines = row_lines
+    @project = project
   end
 
   def analyse_helper(tokens, result, n, by_bracket)
@@ -39,7 +40,7 @@ class Page
     elsif (left_bracket? tokens[0]) && !tokens[1].nil?
       # Case of link like [Scrapbox is a God tool]
       next_bracket = tokens[1..].index(']') + 1
-      literal = Literal.new(tokens[1..(next_bracket - 1)].inject(&:+), Kind::LINK)
+      literal = Literal.new(tokens[1..(next_bracket - 1)].inject(&:+), Kind::LINK, { link: "https://scrapbox.io/#{@project}" })
       analyse_helper(tokens[(next_bracket + 1)..], result + [literal], next_bracket + 1, false)
     elsif (right_bracket? tokens[0]) && by_bracket
       [result, n + 1]
@@ -47,21 +48,20 @@ class Page
       # Case of code block like code:example.rb
       literal = Literal.new(tokens.inject(&:+), Kind::CODE, { code: '' })
       [[literal], 0]
-    elsif result.size.zero?
-      literal = Literal.new(tokens[0], Kind::PLAIN)
-      analyse_helper(tokens[1..], [literal], n + 1, by_bracket)
+    elsif !result.empty? && result[-1].kind == Kind::PLAIN
+        literal = Literal.new(result[-1].text + tokens[0], Kind::PLAIN)
+        result[-1] = literal
+        analyse_helper(tokens[1..], result, n + 1, by_bracket)
     else
-      pre_literal = result[-1]
-      literal = Literal.new(pre_literal.text + tokens[0], Kind::PLAIN)
-      result[-1] = literal
-      analyse_helper(tokens[1..], result, n + 1, by_bracket)
+      literal = Literal.new(tokens[0], Kind::PLAIN)
+      analyse_helper(tokens[1..], result + [literal], n + 1, by_bracket)
     end
   end
 
   def analyse
     @row_lines.inject([]) do |result, row_line|
       tokens = tokenize row_line
-      depth = many?(:white?, tokens[0]) ? tokens[0].count(' ') + tokens[0].count('　') : 0
+      depth = many?(:white?, tokens[0]) ? tokens[0].count(' ') + tokens[0].count('　') + tokens[0].count("\t") : 0
 
       if !result.empty? && !result[-1].empty? && result[-1][-1].kind == Kind::CODE && depth > 0
         result[-1][-1].data[:code] += "#{tokens.inject(&:+)[1..]}\n"

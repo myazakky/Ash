@@ -9,7 +9,7 @@ RSpec.describe Page do
   describe '#analyse' do
     it 'judge kind of [*** _] is BOLD' do
       lines = ['Hello', 'This is [*** Bold]']
-      page = Page.new(lines)
+      page = Page.new(lines, '')
 
       result = page.analyse
       expection = [[Literal.new('Hello', Kind::PLAIN)], [Literal.new('This is ', Kind::PLAIN), Literal.new([Literal.new('Bold', Kind::PLAIN)], Kind::BOLD)]]
@@ -19,7 +19,7 @@ RSpec.describe Page do
 
     it 'judge kind of [--- _] is strike' do
       lines = ['This is [-- Strike]']
-      page = Page.new(lines)
+      page = Page.new(lines, '')
 
       result = page.analyse
       expection = [[Literal.new('This is ', Kind::PLAIN), Literal.new([Literal.new('Strike', Kind::PLAIN)], Kind::STRIKE)]]
@@ -29,7 +29,7 @@ RSpec.describe Page do
 
     it 'judge kind of [**--** _] is bold strike bold' do
       lines = ['[**--** StrikeBold]']
-      page = Page.new(lines)
+      page = Page.new(lines, '')
 
       result = page.analyse
       exception = [[
@@ -42,16 +42,16 @@ RSpec.describe Page do
     end
 
     it 'judge kind of [__] is link' do
-      lines = ['[link yeah]']
-      page = Page.new(lines)
+      lines = ['Hi,[link yeah]']
+      page = Page.new(lines, '')
 
-      expect(page.analyse).to eq [[Literal.new('link yeah', Kind::LINK)]]
+      expect(page.analyse).to eq [[Literal.new('Hi,', Kind::PLAIN), Literal.new('link yeah', Kind::LINK, { link: 'https://scrapbox.io/' })]]
     end
 
     it 'judge kind of [$ \Latex] is latex' do
       lines = ['[$ \LaTex]']
 
-      page = Page.new(lines)
+      page = Page.new(lines, '')
       expect(page.analyse).to eq [[Literal.new('\LaTex', Kind::LATEX)]]
     end
 
@@ -64,7 +64,7 @@ RSpec.describe Page do
         '  EOF',
         'end'
       ]
-      page = Page.new(lines)
+      page = Page.new(lines, '')
       expection = [
         [Literal.new([Literal.new('code:example.rb', Kind::CODE, {
           code: """list = [
@@ -81,7 +81,7 @@ EOF
 
     it 'judge kind of `[aa]` is codeblock'do
       lines = ['`[aa]`']
-      page = Page.new(lines)
+      page = Page.new(lines, '')
 
       expection = [[Literal.new(Literal.new('[aa]', Kind::PLAIN), Kind::CODEBLOCK)]]
       expect(page.analyse).to eq expection
@@ -89,7 +89,7 @@ EOF
 
     it ' judge others is PLAIN' do
       lines = ['Hello', 'Test']
-      page = Page.new(lines)
+      page = Page.new(lines, '')
 
       page.analyse.each_with_index do |line, index|
         expect(line).to eq [Literal.new(lines[index], Kind::PLAIN)]
