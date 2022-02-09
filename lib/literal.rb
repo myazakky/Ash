@@ -26,7 +26,7 @@ class Literal
     when Kind::LINK then "<a href='#{data[:link]}#{@text}'>#{@text}</a>"
     when Kind::LATEX then Katex.render @text
     when Kind::CODE
-      "<code style='background-color: gray'>#{@data[:code]}</code>"
+      "<code style='background-color: gray; display: block;'>#{@data[:code]}</code>"
     when Kind::INDENT
       "<span style='margin-left: #{@data[:depth]}em'>#{@text.map(&:to_html).inject(&:+)}</span>"
     when Kind::CODEBLOCK then "<span style='background-color: gray'>#{@text}</span>"

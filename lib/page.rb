@@ -15,7 +15,8 @@ class Page
   def analyse_helper(tokens, result, n, by_bracket)
     return [result, n] if tokens.nil? || tokens.empty?
 
-    if (left_bracket? tokens[0]) && (many? :decoration?, tokens[1]) && ((many? :white?, tokens[2]) || (many? :decoration?, tokens[2]))
+    if (left_bracket? tokens[0]) && (many? :decoration?,
+                                           tokens[1]) && ((many? :white?, tokens[2]) || (many? :decoration?, tokens[2]))
       # Case of decorated notations like [**-- Hi]
       if many? :white?, tokens[2]
         content = analyse_helper(tokens[3..], [], 0, true)
@@ -40,7 +41,8 @@ class Page
     elsif (left_bracket? tokens[0]) && !tokens[1].nil?
       # Case of link like [Scrapbox is a God tool]
       next_bracket = tokens[1..].index(']') + 1
-      literal = Literal.new(tokens[1..(next_bracket - 1)].inject(&:+), Kind::LINK, { link: "https://scrapbox.io/#{@project}" })
+      literal = Literal.new(tokens[1..(next_bracket - 1)].inject(&:+), Kind::LINK,
+                            { link: "https://scrapbox.io/#{@project}" })
       analyse_helper(tokens[(next_bracket + 1)..], result + [literal], next_bracket + 1, false)
     elsif (right_bracket? tokens[0]) && by_bracket
       [result, n + 1]
@@ -49,9 +51,9 @@ class Page
       literal = Literal.new(tokens.inject(&:+), Kind::CODE, { code: '' })
       [[literal], 0]
     elsif !result.empty? && result[-1].kind == Kind::PLAIN
-        literal = Literal.new(result[-1].text + tokens[0], Kind::PLAIN)
-        result[-1] = literal
-        analyse_helper(tokens[1..], result, n + 1, by_bracket)
+      literal = Literal.new(result[-1].text + tokens[0], Kind::PLAIN)
+      result[-1] = literal
+      analyse_helper(tokens[1..], result, n + 1, by_bracket)
     else
       literal = Literal.new(tokens[0], Kind::PLAIN)
       analyse_helper(tokens[1..], result + [literal], n + 1, by_bracket)
@@ -64,10 +66,10 @@ class Page
       depth = many?(:white?, tokens[0]) ? tokens[0].count(' ') + tokens[0].count('　') + tokens[0].count("\t") : 0
 
       if !result.empty? && !result[-1].empty? && result[-1][-1].kind == Kind::CODE && depth > 0
-        result[-1][-1].data[:code] += "#{tokens.inject(&:+)[1..]}\n"
+        result[-1][-1].data[:code] += "#{tokens.inject(&:+)[1..]}<br>"
         result
       elsif !result.empty? && !result[-1].empty? && !result[-1][-1].text.empty? && result[-1][-1].kind == Kind::INDENT && result[-1][-1].text[0].kind == Kind::CODE && result[-1][-1].data[:depth] < depth
-        result[-1][-1].text[0].data[:code] += "#{tokens.inject(&:+)[(result[-1][-1].data[:depth] + 1)..]}\n"
+        result[-1][-1].text[0].data[:code] += "#{tokens.inject(&:+)[(result[-1][-1].data[:depth] + 1)..]}<br>"
         result
       elsif depth.zero?
         new_item = (analyse_helper tokens, [], 0, false)[0]
