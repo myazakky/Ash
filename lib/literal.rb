@@ -20,16 +20,16 @@ class Literal
 
   def to_html
     case @kind
-    when Kind::PLAIN then "<span>#{@text}</span>"
-    when Kind::BOLD then "<b>#{@text.map(&:to_html).inject(&:+)}</b>"
-    when Kind::STRIKE then "<strike>#{@text.map(&:to_html).inject(&:+)}</strike>"
-    when Kind::LINK then "<a href='#{data[:link]}#{@text}'>#{@text}</a>"
+    when Kind::PLAIN then "<span class='plain'>#{@text}</span>"
+    when Kind::BOLD then "<b class='bold'>#{@text.map(&:to_html).inject(&:+)}</b>"
+    when Kind::STRIKE then "<strike class='strike'>#{@text.map(&:to_html).inject(&:+)}</strike>"
+    when Kind::LINK then "<a href='#{data[:link]}/#{@text}' class='link'>#{@text}</a>"
     when Kind::LATEX then Katex.render @text
     when Kind::CODE
-      "<code style='background-color: gray; display: block;'>#{@data[:code]}</code>"
+      "<code class='code'>#{@data[:code]}</code>"
     when Kind::INDENT
-      "<span style='margin-left: #{@data[:depth]}em'>#{@text.map(&:to_html).inject(&:+)}</span>"
-    when Kind::CODEBLOCK then "<span style='background-color: gray'>#{@text}</span>"
+      "<span class='indent' style='margin-left: #{@data[:depth]}em'>#{@text.map(&:to_html).inject(&:+)}</span>"
+    when Kind::CODEBLOCK then "<span class='codeblock'>#{@text}</span>"
     end
   end
 end
