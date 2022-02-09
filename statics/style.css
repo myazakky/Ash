@@ -1,0 +1,14 @@
+body {
+  margin: 0;
+}
+
+.code {
+  display: block;
+  background-color: #ebe4c0;
+}
+
+.codeblock {
+  display: inline-block;
+  padding: 1px;
+  background-color: #cecece;
+}
