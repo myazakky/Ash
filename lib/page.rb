@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
+require 'bundler/setup'
 require_relative 'literal'
 require_relative 'kind'
 require_relative 'tokenizer'
+require 'rqrcode'
 
 class Page
   include Tokenizer
@@ -82,7 +84,16 @@ class Page
     end
   end
 
+  def make_qrcode(title)
+    content = "https://scrapbox.io/#{@project}/#{title}"
+
+    qr = RQRCode::QRCode.new(content)
+    qr.as_svg
+  end
+
   def to_html
-    analyse.map { _1.map(&:to_html).inject('', &:+) + '<br>' }.inject(&:+)
+    content = analyse[1..].map { _1.map(&:to_html).inject('', &:+) + '<br>' }.inject(&:+)
+    title = analyse[0].map(&:text).inject(&:+)
+    "<h1>#{title}</h1> <br> #{content} #{make_qrcode title}"
   end
 end
